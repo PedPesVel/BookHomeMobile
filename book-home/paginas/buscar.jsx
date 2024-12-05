@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -15,6 +15,23 @@ export default function Principal({ navigation }) {
     };
 
     const isSelected = (filter) => selectedFilters.includes(filter);
+
+    const [preciode, setPreciode] = useState('')
+    const [precioa, setPrecioa] = useState('')
+    const [del, setDel] = useState('')
+    const [metros, setMetros] = useState('')
+    const [hab, setHab] = useState('')
+    const [banos, setBanos] = useState('')
+
+    const val  = () =>{
+        const invalidos = /[<>{}$#!%=~]/
+
+        if(!invalidos.test(preciode) || !invalidos.test(precioa) || !invalidos.test(del) || !invalidos.test(metros) || !invalidos.test(hab)
+        || !invalidos.set(banos)){
+            Alert.alert('PRECAUCIÓN', 'Por favor, evite el ingreso de carácteres no válidos')
+            return;
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -49,12 +66,12 @@ export default function Principal({ navigation }) {
 
                     <Text style={styles.label}>Precio</Text>
                     <View style={styles.row}>
-                        <TextInput style={[styles.input, styles.halfInput]} placeholder="De:" placeholderTextColor="#888" />
-                        <TextInput style={[styles.input, styles.halfInput]} placeholder="A:" placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.halfInput]} name={preciode} onChangeText={setPreciode} placeholder="De:" placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.halfInput]} name={precioa} onChangeText={setPrecioa} placeholder="A:" placeholderTextColor="#888" />
                     </View>
 
                     <Text style={styles.label}>Delegación/Municipio</Text>
-                    <TextInput style={[styles.input]} placeholder="*****" placeholderTextColor="#888" />
+                    <TextInput style={[styles.input]} name={del} onChangeText={setDel} placeholder="*****" placeholderTextColor="#888" />
 
                     <View style={styles.row}>
                         <Text style={styles.label}>m²</Text>
@@ -63,12 +80,12 @@ export default function Principal({ navigation }) {
                     </View>
 
                     <View style={styles.row}>
-                        <TextInput style={[styles.input, styles.thirdInput]} placeholder="###" placeholderTextColor="#888" />
-                        <TextInput style={[styles.input, styles.thirdInput]} placeholder="##" placeholderTextColor="#888" />
-                        <TextInput style={[styles.input, styles.thirdInput]} placeholder="##" placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.thirdInput]} name={metros} onChangeText={setMetros} placeholder="###" placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.thirdInput]} name={hab} onChangeText={setHab} placeholder="##" placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.thirdInput]} name={banos} onChangeText={setBanos} placeholder="##" placeholderTextColor="#888" />
                     </View>
 
-                    <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate('#')}>
+                    <TouchableOpacity style={styles.boton} onPress={val}>
                     <Text style={styles.botonText}>APLICAR FILTROS</Text>
                     </TouchableOpacity>
 

@@ -1,9 +1,29 @@
-import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function Registro({ navigation }) {
+
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('')
+    const [con, setCon] = useState('')
+    const [com, setCom] = useState('')
+
+    const val= ()=> {
+
+        const invalidos = /[<>{}$#!%=~]/
+
+        if(!name || !email || !con || !com){
+            Alert.alert('AVISO', 'Todos los campos son obligatorios.');
+            return;
+        }
+        if(invalidos.test(name) || invalidos.test(email) || invalidos.test(con) || invalidos.test(com)){
+            Alert.alert('PRECAUCIÓN', 'Ingreso de carácteres no validos')
+            return
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}></View>
@@ -16,26 +36,26 @@ export default function Registro({ navigation }) {
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <Ionicons name="person-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888"/>
-                </View>
+                <Ionicons name="person-outline" size={20} color="#000" style={styles.icon} />
+                <TextInput style={styles.input} value={name} onChangeText={setName}  placeholder="Nombre" placeholderTextColor="#888"/>
+                </View>         
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="mail-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#888"/>
                 </View>
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} placeholder="Contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} value={con} onChangeText={setCon} placeholder="Contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
                 </View>
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} placeholder="Confirmar contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} value={com} onChangeText={setCom} placeholder="Confirmar contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
                 </View>
 
-                <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate('principal')}>
+                <TouchableOpacity style={styles.boton} onPress={val}>
                     <Text style={styles.botonText}>REGISTRARSE</Text>
                 </TouchableOpacity>
 

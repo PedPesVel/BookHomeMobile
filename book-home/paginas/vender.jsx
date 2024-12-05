@@ -1,11 +1,60 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function Principal({ navigation }) {
     const [selectedPurpose, setSelectedPurpose] = useState('');
     const [selectedType, setSelectedType] = useState('');
+
+    const [delegacion, setDel] = useState('')
+    const [calle, setCalle] = useState('')
+    const [colonia, setCol] = useState('')
+    const [cod, setCod] = useState('')
+    const [ext, setExt] = useState('')
+    const [inte, setInte] = useState('')
+    const [precio, setPrecio] = useState('')
+    const [metros, setMetros] = useState('')
+    const [hab, setHab] = useState('')
+    const [banos, setBanos] = useState('')
+    const [des, setDes] = useState('')
+
+    const val = () =>{
+
+        const invalidos = /[<>{}$#!%=~]/
+        const numeros = /^[0-9]+$/
+        const solocinco = /^\d{5}$/
+
+        if(!delegacion || !calle || !colonia | !cod || !ext || !precio || !metros || !hab || !banos || !des){
+            Alert.alert('AVISO', 'Los campos marcados con *, son obligatorios.')
+            return;
+        }
+        if(invalidos.test(delegacion) || invalidos.test(calle) || invalidos.test(colonia) || invalidos.test(cod) || invalidos.test(ext) || invalidos.test(inte)
+             || invalidos.test(precio) || invalidos.test(metros)|| invalidos.test(hab) || invalidos.test(banos) || invalidos.test(des)){
+            Alert.alert('PRECAUCIÓN', 'Por favor, evite el ingreso de carácteres no válidos')
+            return;
+        }
+        if(!numeros.test(cod) || !numeros.test(ext) || !numeros.test(inte) || !numeros.test(precio) || !numeros.test(metros) || !numeros.test(hab) || !numeros.test(banos)){
+            Alert.alert('AVISO', 'Por favor, asegúrese de introducir solo números en los campos requeridos')
+            return;
+        }
+        if(!solocinco.test(cod)){
+            Alert.alert('AVISO', 'Por favor, ingrese 5 números para el Código Postal')
+            return;
+        }
+
+        if(!selectedPurpose){
+            Alert.alert('AVISO','Por favor, seleccione Renta o Venta')
+            return;
+        }    
+
+        if(!selectedType){
+            Alert.alert('AVISO','Por favor, seleccione Casa o Departamento')
+            return;
+        }     
+
+        Alert.alert('Válido')
+    }
 
     return (
         <View style={styles.container}>
@@ -20,14 +69,14 @@ export default function Principal({ navigation }) {
             <View style={styles.formVender}>
                 <Text style={styles.textF}>Detalla tu Propiedad</Text>
 
-                <Text style={styles.label}>Delegación/Municipio</Text>
-                <TextInput style={styles.input} placeholder="*****" placeholderTextColor="#888" />
-                <Text style={styles.label}>Calle</Text>
-                <TextInput style={styles.input} placeholder="*****" placeholderTextColor="#888" />
-                <Text style={styles.label}>Colonia</Text>
-                <TextInput style={styles.input} placeholder="*****" placeholderTextColor="#888" />
-                <Text style={styles.label}>Código Postal</Text>
-                <TextInput style={styles.input} placeholder="#####" placeholderTextColor="#888" />
+                <Text style={styles.label}>Delegación/Municipio *</Text>
+                <TextInput style={styles.input} name={delegacion} onChangeText={setDel} placeholder="*****" placeholderTextColor="#888" />
+                <Text style={styles.label}>Calle *</Text>
+                <TextInput style={styles.input} name={calle} onChangeText={setCalle}  placeholder="*****" placeholderTextColor="#888" />
+                <Text style={styles.label}>Colonia *</Text>
+                <TextInput style={styles.input} name={colonia} onChangeText={setCol}  placeholder="*****" placeholderTextColor="#888" />
+                <Text style={styles.label}>Código Postal *</Text>
+                <TextInput style={styles.input} name={cod} onChangeText={setCod}   placeholder="Solo números" placeholderTextColor="#888" />
 
                 <View style={styles.row}>
                     <TouchableOpacity style={[styles.checkbox, selectedPurpose === 'Renta' ? styles.activeFilterButton : styles.inactiveFilterButton ]} onPress={() => setSelectedPurpose('Renta')}>
@@ -48,35 +97,35 @@ export default function Principal({ navigation }) {
                 </View>
 
                 <View style={styles.rowT}>
-                    <Text style={styles.label}>No. Exterior</Text>
+                    <Text style={styles.label}>No. Exterior *</Text>
                     <Text style={styles.label}>No. Interior</Text>
                 </View>
 
                 <View style={styles.rowC}>
-                    <TextInput style={[styles.input, styles.halfInput]} placeholder="####" placeholderTextColor="#888"/>
-                    <TextInput style={[styles.input, styles.halfInput]} placeholder="###"  placeholderTextColor="#888"/>
+                    <TextInput style={[styles.input, styles.halfInput]} name={ext} onChangeText={setExt}  placeholder="Solo números" placeholderTextColor="#888"/>
+                    <TextInput style={[styles.input, styles.halfInput]} name={inte} onChangeText={setInte}  placeholder="Solo números"  placeholderTextColor="#888"/>
                 </View>
 
-                <Text style={styles.label}>Precio</Text>
-                <TextInput style={styles.input} placeholder="$$$$" placeholderTextColor="#888" />
+                <Text style={styles.label}>Precio *</Text>
+                <TextInput style={styles.input} name={precio} onChangeText={setPrecio}  placeholder="Solo números" placeholderTextColor="#888" />
                 
                 <View style={[styles.rowT, styles.rowTsec]}>
-                    <Text style={styles.label}>m²</Text>
-                    <Text style={styles.label}>Habitaciones</Text>
-                    <Text style={styles.label}>Baños</Text>
+                    <Text style={styles.label}>m² *</Text>
+                    <Text style={styles.label}>Habitaciones *</Text>
+                    <Text style={styles.label}>Baños *</Text>
                 </View>
 
                 <View style={styles.rowC}>
-                        <TextInput style={[styles.input, styles.thirdInput]} placeholder="###" placeholderTextColor="#888" />
-                        <TextInput style={[styles.input, styles.thirdInput]} placeholder="##" placeholderTextColor="#888" />
-                        <TextInput style={[styles.input, styles.thirdInput]} placeholder="##" placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.thirdInput]} name={metros} onChangeText={setMetros}  placeholder="Solo números"placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.thirdInput]} name={hab} onChangeText={setHab}  placeholder="Solo números" placeholderTextColor="#888" />
+                        <TextInput style={[styles.input, styles.thirdInput]} name={banos} onChangeText={setBanos}  placeholder="Solo números" placeholderTextColor="#888" />
                 </View>
 
-                <Text style={styles.label}>Descripción</Text>
-                <TextInput style={[styles.input, styles.multiline]} placeholder="****" placeholderTextColor="#888" multiline={true}/>
+                <Text style={styles.label}>Descripción *</Text>
+                <TextInput style={[styles.input, styles.multiline]} name={des} onChangeText={setDes}  placeholder="****" placeholderTextColor="#888" multiline={true}/>
             </View>
 
-            <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate('#')}>
+            <TouchableOpacity style={styles.boton} onPress={val}>
                     <Text style={styles.botonText}>REGISTRAR PROPIEDAD</Text>
             </TouchableOpacity>
 

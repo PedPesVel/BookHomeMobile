@@ -1,9 +1,25 @@
-import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, {useState} from 'react';
+import { Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function Sesion({ navigation }) {
+
+    const [email, setEmail] = useState('')
+    const [con, setCon] = useState('')
+
+    const val = ()=>{
+
+        const invalidos = /[<>{}$#!%=~]/
+
+        if(!email || !con){
+            Alert.alert('AVISO', 'Todos los campos son obligatorios.');
+            return;
+        }
+        if(invalidos.test(email) || invalidos.test(con)){
+            Alert.alert('PRECAUCIÓN', 'Ingreso de carácteres no válidos')
+        }
+    }
     return (
         <View style={styles.container}>
             <View style={styles.header}/>
@@ -16,19 +32,19 @@ export default function Sesion({ navigation }) {
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <Ionicons name="mail-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} placeholder="Email"  placeholderTextColor="#888"/>
+                    <Ionicons name="mail-outline" size={20} color="#000" style={styles.icon}/>
+                    <TextInput style={styles.input} name={email} onChangeText={setEmail} placeholder="Email"  placeholderTextColor="#888"/>
                 </View>
                 <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} placeholder="Contraseña" secureTextEntry={true}  placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} name={con} onChangeText={setCon} placeholder="Contraseña" secureTextEntry={true}  placeholderTextColor="#888"/>
                 </View>
 
                 <TouchableOpacity onPress={() => navigation.navigate('sesion')}>
                     <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate('principal')}>
+                <TouchableOpacity style={styles.boton} onPress={val}>
                     <Text style={styles.botonText}>INICIAR SESIÓN</Text>
                 </TouchableOpacity>
 

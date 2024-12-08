@@ -141,8 +141,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center', // Asegura que los botones estén centrados
         alignItems: 'center',
         marginVertical: 30, // Espaciado vertical
+        paddingRight: 65,
         width: '100%', // Ocupará todo el ancho disponible
-        paddingRight: 80,
         marginBottom: 40,
     },
     socialbutton: {
@@ -159,6 +159,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         elevation: 3, // Sombra para Android
-        marginHorizontal: 15,
+        marginHorizontal: 10, // Espacio uniforme entre los botones
     },
+    
+    
 });

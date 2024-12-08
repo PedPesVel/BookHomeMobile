@@ -1,29 +1,45 @@
+import firebase from 'firebase';
 import React, { useState } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+
+
 export default function Registro({ navigation }) {
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('')
-    const [con, setCon] = useState('')
-    const [com, setCom] = useState('')
+    const [state, setState] = useState({
+        name: '',
+        email: '',
+        contra: '',
+        concontra:''
+    });
 
-    const val= ()=> {
-
-        const invalidos = /[<>{}$#!%=~]/
-
-        if(!name || !email || !con || !com){
+    const AddNewUser=()=>{
+        if (!state.name || !state.email || !state.contra || !state.concontra) {
             Alert.alert('AVISO', 'Todos los campos son obligatorios.');
             return;
+        }else if(state.contra!=state.concontra){
+            Alert.alert('AVISO', 'Las contraseñas no coinciden');
+            return;
         }
-        if(invalidos.test(name) || invalidos.test(email) || invalidos.test(con) || invalidos.test(com)){
-            Alert.alert('PRECAUCIÓN', 'Ingreso de carácteres no validos')
-            return
+        else{
+            
+            firebase.db.collection('users').add({
+                name:state.name,
+                email:state.email,
+                contra:state.contra
+            })
+            Alert.alert('todo good')
         }
-    };
+        
 
+    }
+
+
+    const handleChangeText=(name,value)=>{
+        setState({...state, [name]:value})
+    }
     return (
         <View style={styles.container}>
             <View style={styles.header}></View>
@@ -37,25 +53,25 @@ export default function Registro({ navigation }) {
 
                 <View style={styles.inputContainer}>
                 <Ionicons name="person-outline" size={20} color="#000" style={styles.icon} />
-                <TextInput style={styles.input} value={name} onChangeText={setName}  placeholder="Nombre" placeholderTextColor="#888"/>
+                <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('name', value)}  placeholder="Nombre" placeholderTextColor="#888"/>
                 </View>         
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="mail-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('email', value)} placeholder="Email" placeholderTextColor="#888"/>
                 </View>
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} value={con} onChangeText={setCon} placeholder="Contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('contra', value)} placeholder="Contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
                 </View>
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} value={com} onChangeText={setCom} placeholder="Confirmar contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('concontra', value)} placeholder="Confirmar contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
                 </View>
 
-                <TouchableOpacity style={styles.boton} onPress={val}>
+                <TouchableOpacity style={styles.boton} onPress={()=>AddNewUser()}>
                     <Text style={styles.botonText}>REGISTRARSE</Text>
                 </TouchableOpacity>
 
@@ -154,7 +170,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 30, // Espaciado vertical
         width: '100%', // Ocupará todo el ancho disponible
-        paddingRight: 80,
+        paddingRight: 60,
         marginBottom: 40,
     },
     socialbutton: {

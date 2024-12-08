@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function Principal({ navigation }) {
+    
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -31,8 +32,8 @@ export default function Principal({ navigation }) {
                     <Text style={styles.navText}>Vender</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('perfil')}>
-                    <FontAwesome name="bars" size={28} color="#f0f4f3" />
-                    <Text style={styles.navText}>Más</Text>
+                    <Ionicons name="person-circle-outline" size={28} color="#f0f4f3" />
+                    <Text style={styles.navText}>Perfil</Text>
                 </TouchableOpacity>
             </View>
         </View>

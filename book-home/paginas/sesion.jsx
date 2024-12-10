@@ -1,69 +1,152 @@
-import React, {useState} from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState } from 'react';
+import {
+    Text,
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    TextInput,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { auth } from '../firebaseConfig';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 
 export default function Sesion({ navigation }) {
+    const [email, setEmail] = useState('');
+    const [con, setCon] = useState('');
 
-    const [email, setEmail] = useState('')
-    const [con, setCon] = useState('')
+    // Función para manejar el inicio de sesión
+    const iniciarSesion = async () => {
+        const invalidos = /[<>{}$#!%=~]/;
 
-    const val = ()=>{
-
-        const invalidos = /[<>{}$#!%=~]/
-
-        if(!email || !con){
+        if (!email || !con) {
             Alert.alert('AVISO', 'Todos los campos son obligatorios.');
             return;
         }
-        if(invalidos.test(email) || invalidos.test(con)){
-            Alert.alert('PRECAUCIÓN', 'Ingreso de carácteres no válidos')
+
+        if (invalidos.test(email) || invalidos.test(con)) {
+            Alert.alert('PRECAUCIÓN', 'Ingreso de caracteres no válidos');
+            return;
         }
-    }
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, con);
+            Alert.alert('Bienvenido', `Has iniciado sesión como ${userCredential.user.email}`);
+            navigation.navigate('principal'); // Redirige al usuario a la página principal
+        } catch (error) {
+            console.error(error);
+            if (error.code === 'auth/user-not-found') {
+                Alert.alert(
+                    'Error',
+                    'El correo no existe. ¿Deseas registrarte?',
+                    [
+                        { text: 'Cancelar', style: 'cancel' },
+                        { text: 'Registrarse', onPress: () => navigation.navigate('registro') }
+                    ]
+                );
+            } else if (error.code === 'auth/wrong-password') {
+                Alert.alert('Error', 'Contraseña incorrecta.');
+            } else {
+                Alert.alert('Error', 'No se pudo iniciar sesión. Inténtalo de nuevo más tarde.');
+            }
+        }
+    };
+
+    // Función para manejar recuperación de contraseña
+    const recuperarContrasena = async () => {
+        if (!email) {
+            Alert.alert('AVISO', 'Por favor, ingresa tu correo electrónico para recuperar la contraseña.');
+            return;
+        }
+
+        try {
+            await sendPasswordResetEmail(auth, email);
+            Alert.alert(
+                'Éxito',
+                'Se ha enviado un correo para restablecer tu contraseña. Revisa tu bandeja de entrada.'
+            );
+        } catch (error) {
+            console.error(error);
+            if (error.code === 'auth/user-not-found') {
+                Alert.alert('Error', 'El correo no está registrado.');
+            } else {
+                Alert.alert('Error', 'No se pudo enviar el correo de recuperación. Inténtalo más tarde.');
+            }
+        }
+    };
+
     return (
-        <View style={styles.container}>
-            <View style={styles.header}/>
-            <View style={styles.content}>
-                <Text style={styles.text}>Inicio de Sesión</Text>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+            <ScrollView contentContainerStyle={styles.container}>
+                <View style={styles.header} />
+                <View style={styles.content}>
+                    <Text style={styles.text}>Inicio de Sesión</Text>
 
-                <View style={styles.socialcontainer}>
-                    <TouchableOpacity style={styles.socialbutton}><FontAwesome name="google" size={30} color="#000" /></TouchableOpacity>                   
-                    <TouchableOpacity style={styles.socialbutton}><FontAwesome name="facebook" size={30} color="#000" /></TouchableOpacity>   
+                    <View style={styles.socialcontainer}>
+                        <TouchableOpacity style={styles.socialbutton}>
+                            <FontAwesome name="google" size={30} color="#000" />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.socialbutton}>
+                            <FontAwesome name="facebook" size={30} color="#000" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Ionicons name="mail-outline" size={20} color="#000" style={styles.icon} />
+                        <TextInput
+                            style={styles.input}
+                            value={email}
+                            onChangeText={setEmail}
+                            placeholder="Email"
+                            placeholderTextColor="#888"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
+                        <TextInput
+                            style={styles.input}
+                            value={con}
+                            onChangeText={setCon}
+                            placeholder="Contraseña"
+                            secureTextEntry={true}
+                            placeholderTextColor="#888"
+                        />
+                    </View>
+
+                    <TouchableOpacity onPress={recuperarContrasena}>
+                        <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.boton} onPress={iniciarSesion}>
+                        <Text style={styles.botonText}>INICIAR SESIÓN</Text>
+                    </TouchableOpacity>
+
+                    <Text style={styles.textn}>¿Aún no tienes cuenta?</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('registro')}>
+                        <Text style={styles.linkText}>Registrarse</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => navigation.navigate('principal')}>
+                        <Text style={styles.linkTextP}>Página Principal</Text>
+                    </TouchableOpacity>
                 </View>
-
-                <View style={styles.inputContainer}>
-                    <Ionicons name="mail-outline" size={20} color="#000" style={styles.icon}/>
-                    <TextInput style={styles.input} name={email} onChangeText={setEmail} placeholder="Email"  placeholderTextColor="#888"/>
-                </View>
-                <View style={styles.inputContainer}>
-                    <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} name={con} onChangeText={setCon} placeholder="Contraseña" secureTextEntry={true}  placeholderTextColor="#888"/>
-                </View>
-
-                <TouchableOpacity onPress={() => navigation.navigate('sesion')}>
-                    <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.boton} onPress={val}>
-                    <Text style={styles.botonText}>INICIAR SESIÓN</Text>
-                </TouchableOpacity>
-
-                <Text style={styles.textn}>¿Aún no tienes cuenta?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('registro')}>
-                    <Text style={styles.linkText}>Registrarse</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate('principal')}>
-                    <Text style={styles.linkTextP}>Página Principal</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: '#f0f4f3',
@@ -138,29 +221,27 @@ const styles = StyleSheet.create({
     },
     socialcontainer: {
         flexDirection: 'row',
-        justifyContent: 'center', // Asegura que los botones estén centrados
+        justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 30, // Espaciado vertical
+        marginVertical: 30,
         paddingRight: 65,
-        width: '100%', // Ocupará todo el ancho disponible
+        width: '100%',
         marginBottom: 40,
     },
     socialbutton: {
-        width: 60, // Botones ligeramente más grandes
+        width: 60,
         height: 60,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#f0f4f3', // Color del borde más llamativo
-        borderRadius: 30, // Forma circular
+        borderColor: '#f0f4f3',
+        borderRadius: 30,
         backgroundColor: '#f0f4f3',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 3, // Sombra para Android
-        marginHorizontal: 10, // Espacio uniforme entre los botones
+        elevation: 3,
+        marginHorizontal: 10,
     },
-    
-    
 });

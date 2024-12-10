@@ -1,45 +1,71 @@
-import firebase from 'firebase';
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, TextInput, Alert, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
-
+import { auth } from '../firebaseConfig';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Registro({ navigation }) {
-
     const [state, setState] = useState({
         name: '',
         email: '',
         contra: '',
-        concontra:''
+        concontra: '',
+        num: '',
     });
 
-    const AddNewUser=()=>{
-        if (!state.name || !state.email || !state.contra || !state.concontra) {
-            Alert.alert('AVISO', 'Todos los campos son obligatorios.');
-            return;
-        }else if(state.contra!=state.concontra){
-            Alert.alert('AVISO', 'Las contraseñas no coinciden');
+    // Función para manejar cambios en los inputs
+    const handleChangeText = (name, value) => {
+        setState({ ...state, [name]: value });
+    };
+
+    // Función para registrar un nuevo usuario
+    const AddNewUser = async () => {
+        const { name, email, contra, concontra, num } = state;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+        const phoneRegex = /^\d{10}$/; 
+
+        // Validaciones
+        if (!name || !email || !contra || !concontra || !num) {
+            Alert.alert('Error', 'Por favor completa todos los campos');
             return;
         }
-        else{
-            
-            firebase.db.collection('users').add({
-                name:state.name,
-                email:state.email,
-                contra:state.contra
-            })
-            Alert.alert('todo good')
+
+        if (!phoneRegex.test(num) || num < 0) {
+            Alert.alert('Error', 'Ingresa un número de teléfono válido');
+            return;
         }
-        
 
-    }
+        if (!emailRegex.test(email)) {
+            Alert.alert('Error', 'Por favor ingresa un email válido');
+            return;
+        }
 
+        if (contra.length < 6) {
+            Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+            return;
+        }
 
-    const handleChangeText=(name,value)=>{
-        setState({...state, [name]:value})
-    }
+        if (contra !== concontra) {
+            Alert.alert('Error', 'Las contraseñas no coinciden');
+            return;
+        }
+
+        // Registro con Firebase
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, contra);
+            Alert.alert('Registro exitoso', `Bienvenido, ${userCredential.user.email}`);
+            navigation.navigate('sesion');
+        } catch (error) {
+            if (error.code === 'auth/email-already-in-use') {
+                Alert.alert('Error', 'Este correo ya está registrado. Por favor usa otro.');
+            } else {
+                console.error(error);
+                Alert.alert('Error de registro', error.message);
+            }
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}></View>
@@ -47,31 +73,40 @@ export default function Registro({ navigation }) {
                 <Text style={styles.text}>Registrarse</Text>
 
                 <View style={styles.socialcontainer}>
-                    <TouchableOpacity style={styles.socialbutton}><FontAwesome name="google" size={30} color="#000" /></TouchableOpacity>
-                    <TouchableOpacity style={styles.socialbutton}><FontAwesome name="facebook" size={30} color="#000" /></TouchableOpacity>
+                    <TouchableOpacity style={styles.socialbutton}>
+                        <FontAwesome name="google" size={30} color="#000" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.socialbutton}>
+                        <FontAwesome name="facebook" size={30} color="#000" />
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.inputContainer}>
-                <Ionicons name="person-outline" size={20} color="#000" style={styles.icon} />
-                <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('name', value)}  placeholder="Nombre" placeholderTextColor="#888"/>
-                </View>         
+                    <Ionicons name="person-outline" size={20} color="#000" style={styles.icon} />
+                    <TextInput style={styles.input} onChangeText={(value) => handleChangeText('name', value)} placeholder="Nombre" placeholderTextColor="#888" />
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <Ionicons name="call-outline" size={20} color="#000" style={styles.icon} />
+                    <TextInput style={styles.input} onChangeText={(value) => handleChangeText('num', value)} placeholder="Número de Teléfono" keyboardType="numeric" placeholderTextColor="#888" />
+                </View>
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="mail-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('email', value)} placeholder="Email" placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} onChangeText={(value) => handleChangeText('email', value)} placeholder="Email" placeholderTextColor="#888" />
                 </View>
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('contra', value)} placeholder="Contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} onChangeText={(value) => handleChangeText('contra', value)} placeholder="Contraseña" secureTextEntry={true} placeholderTextColor="#888" />
                 </View>
 
                 <View style={styles.inputContainer}>
                     <Ionicons name="lock-closed-outline" size={20} color="#000" style={styles.icon} />
-                    <TextInput style={styles.input} onChangeText={(value)=>handleChangeText('concontra', value)} placeholder="Confirmar contraseña" secureTextEntry={true} placeholderTextColor="#888"/>
+                    <TextInput style={styles.input} onChangeText={(value) => handleChangeText('concontra', value)} placeholder="Confirmar contraseña" secureTextEntry={true} placeholderTextColor="#888" />
                 </View>
 
-                <TouchableOpacity style={styles.boton} onPress={()=>AddNewUser()}>
+                <TouchableOpacity style={styles.boton} onPress={AddNewUser}>
                     <Text style={styles.botonText}>REGISTRARSE</Text>
                 </TouchableOpacity>
 
@@ -87,6 +122,7 @@ export default function Registro({ navigation }) {
         </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
